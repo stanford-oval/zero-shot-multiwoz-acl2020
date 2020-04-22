@@ -8,14 +8,12 @@ genie = node --experimental_worker --max_old_space_size=$(memsize) $(geniedir)/t
 owner ?= gcampax
 
 domains = attraction hotel restaurant taxi train
-transfer_experiments = restaurant2hotel taxi2train hotel2restaurant restaurant2attraction train2taxi
 fewshot_experiments = 0 1 5 10
 
 eval_models = \
-	trade-dst/baseline21-rerun \
-	trade-dst/aug16 \
-	$(foreach d,$(domains),trade-dst/except-$(d)) \
-	$(foreach exp,$(transfer_experiments),$(foreach fw,$(fewshot_experiments),trade-dst/$(exp)-pct$(fw) trade-dst/$(exp)-pct$(fw)-tr16))
+	trade-dst/baseline \
+	trade-dst/augmented \
+	$(foreach d,$(domains),trade-dst/except-$(d)-original $(foreach fw,$(fewshot_experiments),trade-dst/$(exp)-pct$(fw) trade-dst/$(exp)-pct$(fw)-tr16))
 
 first_turn_gen_flags = --target-pruning-size 50000 --maxdepth 9
 dialog_gen_flags = --target-pruning-size 1000 --minibatch-size 10000 --max-turns 6 --maxdepth 6
@@ -75,12 +73,7 @@ data-generated: train_dials.json data/dev_dials.json data/test_dials.json origin
 	cp original-ontology.json $@/multi-woz/MULTIWOZ2.1/ontology.json
 	touch $@
 
-#models/trade-dst/%:
-#	aws s3 sync s3://almond-research/gcampax/models/multiwoz/$*/ $@
-
 models/trade-dst/%/results:
-	mkdir -p "models/trade-dst"
-	aws s3 sync s3://almond-research/gcampax/models/multiwoz/$*/ "models/trade-dst/$*"
 	./evaluate-trade-dst.sh "$(tradedir)" "models/trade-dst/$*"
 
 evaluate: $(foreach v,$(eval_models),models/$(v)/results)
