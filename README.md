@@ -18,6 +18,8 @@ To reproduce our papers, you need the following repositories, and their exact ve
 - <https://github.com/stanford-oval/trade-dst> tag acl2020-submission (d2326a446f07124d2d5babe676fef54dd1b04491)
 - <https://github.com/stanford-oval/genie-toolkit> tag acl2020-submission (d37d0c01735d14c32fd699e358405e22b9cf51be)
 
+Edit the first two lines of the `Makefile` to point to the directories where you cloned those repositories.
+
 You will also need the following packages:
 - nodejs (version 10.*)
 - yarn
@@ -42,14 +44,110 @@ NOTE: the trade-dst repository includes the scripts and Dockerfiles that we used
 
 ## Pretrained Models
 
-Pretrained models can be downloaded from...
+The following pretrained models are availabe:
+
+- {trade-dst,sumbt}/baseline: trained with full dataset
+- {trade-dst,sumbt}/augmented: trained with full dataset and synthesized data
+- trade-dst/except-{attraction,hotel,restaurant,taxi,train}-original: trained in zero-shot fashion, with the original zero-shot strategy
+- {trade-dst,sumbt}/except-{attraction,hotel,restaurant,taxi,train}-pct0: new zero-shot baseline
+- {trade-dst,sumbt}/except-{attraction,hotel,restaurant,taxi,train}-pct0-augmented: our approach: zero-shot with synthesized data and domain adaptation
+- {trade-dst,sumbt}/except-{attraction,hotel,restaurant,taxi,train}-pct{1,5,10}: few-shot baseline
+- {trade-dst,sumbt}/except-{attraction,hotel,restaurant,taxi,train}-pct{1,5,10}-augmented: few-shot training with synthesized data and domain adaptation 
+
+Pretrained models can be downloaded from <https://almond-static.stanford.edu/papers/acl2020/> by appending the model name and `.tar.xz`. For example, the `trade-dst/baseline` model can be downloaded from <https://almond-static.stanford.edu/papers/acl2020/trade-dst/baseline.tar.xz>.
+
+For convenience, all pretrained models can be downloaded at once with the command:
+```bash
+make download-pretrained
+```
 
 ## Evaluating The Trained Models
 
-### Figure 1
+To evaluate a model, first download the original MultiWOZ 2.1 dataset (containing the dev and test sets) in the `data` directory, using:
+```bash
+make data
+```
 
-### Figure 2
+Place the models you wish to evaluate in `models/`, unpacked, one model per directory (e.g. the `trade-dst/baseline` model should have a `models/trade-dst/baseline` directory). Add them in the `eval_models` variable in the Makefile.
+Then execute:
+```bash
+make evaluate
+```
+
+This command will place a `results` file in each model directory. The script will evaluate on the full test set (line "Everything"), and on each domain individually (all dialogues that include that domain, for the subset of slots in that domain, lines "Only X"). The results file contains three columns for each evaluation: joint accuracy, slot accuracy, and slot F1 (not reported in the paper).
+
+### Table 3: Accuracy on the full MultiWOZ dataset
+
+To reproduce this table, evaluate these models:
+- row "TRADE no": trade-dst/baseline
+- row "TRADE yes": trade-dst/augmented
+- row "SUMBT no": sumbt/baseline
+- row "SUMBT yes": sumbt/augmented
+
+After evaluation, look for the `results` file. The table numbers will match the line prefixed with "Everything".
+
+### Table 4: Accuracy on the zero-shot MultiWOZ experiment
+
+To reproduce this table, evaluate these models:
+- row "TRADE full dataset" and "SUMBT full dataset": evaluate as in the previous section, then look for result lines prefixed with "Only X"
+- row "TRADE original zero shot": evaluate the models "trade-dst/except-*-original"; in each model, look for the result lines prefixed with "Only X" for the corresponding "X" (e.g. for the column "Restaurant", evaluate the model "trade-dst/except-restaurant-original" and look for the lines "Only restaurant")
+- row "TRADE zero-shot baseline": evaluate the models "trade-dst/except-*-pct0"; in each model, look for the result lines prefixed with "Only X" for the corresponding "X" (e.g. for the column "Restaurant", evaluate the model "trade-dst/except-restaurant-pct0" and look for the lines "Only restaurant")
+- row "TRADE out zero-shot": evaluate the models "trade-dst/except-*-pct0-augmented" 
+- row "SUMBT zero-shot baseline": evaluate the models "sumbt/except-*-pct0"; in each model, look for the result lines prefixed with "Only X" for the corresponding "X" (e.g. for the column "Restaurant", evaluate the model "trade-dst/except-restaurant-pct0" and look for the lines "Only restaurant")
+- row "SUMBT out zero-shot": evaluate the models "sumbt/except-*-pct0-augmented" 
+
+### Figure 4: Few-shot MultiWOZ experiment
+
+To draw each plot, use the joint accuracy computed from the models "trade-dst/except-*-pct{0,1,5,10}" and "sumbt/except-*-pct{0,1,5,10}", e.g. for the "Restaurant" plot consider the models "trade-dst/except-restaurant-pct{0,1,5,10}" and "submt/except-restaurant-pct{0,1,5,10}". The models suffixed with "-augmented" include synthesis, and the models without suffix are baselines.
 
 ## Generating New Fresh Datasets
 
+To generate a new dataset, use the command:
+
+```bash
+make data-generated transfer_from_domain=... transfer_to_domain=... synthetic_gen_domains=... fewshot_pct=... synthetic_sample_prob=...
+```
+
+The dataset is generated in the "data-generated" directory. You must copy/move that directory elsewhere to avoid clobbering it with multiple invocations of the generation command.
+
+The data is generated in TRADE format. To convert to SUMBT format, use:
+
+**TODO SUMBT**
+
+To generate the full dataset (all domains, with augmentation), use:
+```bash
+make data-generated transfer_from_domain= transfer_to_domain= synthetic_gen_domains="attraction hotel restaurant taxi train" synthetic_sample_prob=0.03
+```
+
+To generate the zero-shot datasets, use:
+```bash
+make data-generated transfer_from_domain=restaurant transfer_to_domain=attraction synthetic_gen_domains=attraction fewshot_pct=0 synthetic_sample_prob=0.06
+make data-generated transfer_from_domain=restaurant transfer_to_domain=hotel synthetic_gen_domains=hotel fewshot_pct=0 synthetic_sample_prob=0.06
+make data-generated transfer_from_domain=hotel transfer_to_domain=restaurant synthetic_gen_domains=restaurant fewshot_pct=0 synthetic_sample_prob=0.06
+make data-generated transfer_from_domain=train transfer_to_domain=taxi synthetic_gen_domains=taxi fewshot_pct=0 synthetic_sample_prob=0.06
+make data-generated transfer_from_domain=taxi transfer_to_domain=train synthetic_gen_domains=train fewshot_pct=0 synthetic_sample_prob=0.06
+```
+
+Change `fewshot_pct` to generate a few-shot dataset.
+
 ## Training
+
+To train TRADE-DST, use the script:
+
+```bash
+./train-trade-dst.sh $tradedir $modeldir $datadir <hparams>
+```
+
+(`$tradedir` should be set to the full path to the trade-dst checkout directory)
+
+The model will be trained on data contained in `$datadir` (which must be in the TRADE format), and will be saved to `$modeldir`. Later, it can be evaluated with:
+```bash
+./evaluate-trade-dst.sh $tradedir $modeldir
+```
+
+Our models were trained with:
+```bash
+./train-trade-dst.sh $tradedir $modeldir $datadir -dec=TRADE -bsz=8 -dr=0.2 -lr=0.001 -le=1
+```
+
+This corresponds to the recommended hyperparameters, except for a smaller batch size (that fits on a V100 GPU with 16GB of VRAM, available on AWS).
