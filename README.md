@@ -54,7 +54,7 @@ The following pretrained models are availabe:
 - {trade-dst,sumbt}/except-{attraction,hotel,restaurant,taxi,train}-pct{1,5,10}: few-shot baseline
 - {trade-dst,sumbt}/except-{attraction,hotel,restaurant,taxi,train}-pct{1,5,10}-augmented: few-shot training with synthesized data and domain adaptation 
 
-Pretrained models can be downloaded from <https://almond-static.stanford.edu/papers/acl2020/> by appending the model name and `.tar.xz`. For example, the `trade-dst/baseline` model can be downloaded from <https://almond-static.stanford.edu/papers/acl2020/trade-dst/baseline.tar.xz>.
+Pretrained models can be downloaded from <https://oval.cs.stanford.edu/releases/acl2020/> by appending the model name and `.tar.xz`. For example, the `trade-dst/baseline` model can be downloaded from <https://oval.cs.stanford.edu/releases/acl2020/trade-dst/baseline.tar.xz>.
 
 For convenience, all pretrained models can be downloaded at once with the command:
 ```bash
@@ -151,3 +151,11 @@ Our models were trained with:
 ```
 
 This corresponds to the recommended hyperparameters, except for a smaller batch size (that fits on a V100 GPU with 16GB of VRAM, available on AWS).
+
+## License
+
+This repository (containing the evaluation scripts) is licensed under the MIT license. See the [LICENSE](LICENSE) for details.
+
+Other repositories referred to but this one (including genie-toolkit, trade-dst, sumbt) are copyright of their respective authors, and are available under different licenses. You are responsible for complying with the copyright license in all the software you download and use.
+
+Synthesized data includes data derived from domain-independent and domain-dependent templates, which are covered by the genie-toolkit license. If you use or distribute the synthesized data, you must comply with the genie-toolkit license.

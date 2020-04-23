@@ -15,8 +15,8 @@ shift
 
 # note: myTest is very, very broken, and assumes a very specific directory layout inside save/
 cd $tradedir
-ln -sf "$modeldir" save
-ln -sf "$srcdir/data" data
+ln -sfT "$modeldir" save
+ln -sfT "$srcdir/data" data
 
 best_model=$(ls -d save/TRADE*/HDD*BSZ* | sort -r | head -n1)
 

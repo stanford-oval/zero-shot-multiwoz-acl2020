@@ -13,7 +13,7 @@ fewshot_experiments = 0 1 5 10
 eval_models = \
 	trade-dst/baseline \
 	trade-dst/augmented \
-	$(foreach d,$(domains),trade-dst/except-$(d)-original $(foreach fw,$(fewshot_experiments),trade-dst/$(exp)-pct$(fw) trade-dst/$(exp)-pct$(fw)-tr16))
+	$(foreach d,$(domains),trade-dst/except-$(d)-original $(foreach fw,$(fewshot_experiments),trade-dst/except-$(d)-pct$(fw) trade-dst/except-$(d)-pct$(fw)-augmented))
 
 first_turn_gen_flags = --target-pruning-size 50000 --maxdepth 9
 dialog_gen_flags = --target-pruning-size 1000 --minibatch-size 10000 --max-turns 6 --maxdepth 6
