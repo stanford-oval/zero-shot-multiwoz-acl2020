@@ -138,7 +138,11 @@ make data-generated transfer_from_domain= transfer_to_domain=taxi synthetic_gen_
 make data-generated transfer_from_domain= transfer_to_domain=train synthetic_gen_domains= fewshot_pct=0 synthetic_sample_prob=0
 ```
 
+**NOTE**: dataset generation is not perfectly deterministic, due to parallelism. The datasets that were used to train the pretrained models are available for download from <https://oval.cs.stanford.edu/releases/acl2020/dataset/> by appending the model suffix and `.tar.xz`. For example, the `augmented` dataset can be downloaded from <https://oval.cs.stanford.edu/releases/acl2020/dataset/augmented.tar.xz>, and the `except-restaurant-pct0-augmented` dataset can be downloaded from <https://oval.cs.stanford.edu/releases/acl2020/dataset/except-restaurant-pct0-augmented.tar.xz>.
+
 ## Training
+
+### TRADE-DST
 
 To train TRADE-DST, use the script:
 
@@ -153,12 +157,24 @@ The model will be trained on data contained in `$datadir` (which must be in the 
 ./evaluate-trade-dst.sh $tradedir $modeldir
 ```
 
-Our models were trained with:
+The models are trained with the recommended hyperparameters, except for a smaller batch size (that fits on a V100 GPU with 16GB of VRAM, available on AWS). You can change the hyperparameters from inside the train-trade-dst.sh script.
+
+### SUMBT
+
+To train SUBMT, use the script:
+
 ```bash
-./train-trade-dst.sh $tradedir $modeldir $datadir -dec=TRADE -bsz=8 -dr=0.2 -lr=0.001 -le=1
+./train-sumbt.sh $sumbtdir $modeldir $datadir <hparams>
 ```
 
-This corresponds to the recommended hyperparameters, except for a smaller batch size (that fits on a V100 GPU with 16GB of VRAM, available on AWS).
+(`$sumbtdir` should be set to the full path to the trade-dst checkout directory)
+
+The model will be trained on data contained in `$datadir` (which must be in the SUMBT format), and will be saved to `$modeldir`. Later, it can be evaluated with:
+```bash
+./evaluate-sumbt.sh $sumbtdir $modeldir
+```
+
+The models are trained with the recommended hyperparameters. You can change the hyperparameters from inside the train-sumbt.sh script.
 
 ## License
 
