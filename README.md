@@ -110,16 +110,14 @@ make data-generated transfer_from_domain=... transfer_to_domain=... synthetic_ge
 
 The dataset is generated in the "data-generated" directory. You must copy/move that directory elsewhere to avoid clobbering it with multiple invocations of the generation command.
 
-The data is generated in TRADE format. To convert to SUMBT format, use:
-
-**TODO SUMBT**
+The data is generated in TRADE format. To convert to SUMBT format, use `make data-sumbt` for the regular dataset, and `make data-generated-sumbt` for a generated dataset.
 
 To generate the full dataset (all domains, with augmentation), use:
 ```bash
 make data-generated transfer_from_domain= transfer_to_domain= synthetic_gen_domains="attraction hotel restaurant taxi train" synthetic_sample_prob=0.03
 ```
 
-To generate the zero-shot datasets, use:
+To generate the zero-shot datasets with synthesis and domain transfer, use:
 ```bash
 make data-generated transfer_from_domain=restaurant transfer_to_domain=attraction synthetic_gen_domains=attraction fewshot_pct=0 synthetic_sample_prob=0.06
 make data-generated transfer_from_domain=restaurant transfer_to_domain=hotel synthetic_gen_domains=hotel fewshot_pct=0 synthetic_sample_prob=0.06
@@ -129,6 +127,16 @@ make data-generated transfer_from_domain=taxi transfer_to_domain=train synthetic
 ```
 
 Change `fewshot_pct` to generate a few-shot dataset.
+
+To generate the zero-shot datasets for the baseline, use:
+
+```bash
+make data-generated transfer_from_domain= transfer_to_domain=attraction synthetic_gen_domains= fewshot_pct=0 synthetic_sample_prob=0
+make data-generated transfer_from_domain= transfer_to_domain=hotel synthetic_gen_domains= fewshot_pct=0 synthetic_sample_prob=0
+make data-generated transfer_from_domain= transfer_to_domain=restaurant synthetic_gen_domains= fewshot_pct=0 synthetic_sample_prob=0
+make data-generated transfer_from_domain= transfer_to_domain=taxi synthetic_gen_domains= fewshot_pct=0 synthetic_sample_prob=0
+make data-generated transfer_from_domain= transfer_to_domain=train synthetic_gen_domains= fewshot_pct=0 synthetic_sample_prob=0
+```
 
 ## Training
 

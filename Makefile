@@ -1,5 +1,6 @@
 geniedir ?= $(HOME)/Projects/genie-toolkit
 tradedir ?= $(HOME)/Projects/trade-dst
+sumbtdir ?= $(HOME)/Projects/SUMBT
 
 memsize := $(shell echo $$(($$(grep MemTotal /proc/meminfo | sed 's/[^0-9]//g')/1000-2500)))
 parallel := $(shell echo $$(($$(grep processor /proc/cpuinfo | wc -l)-1)))
@@ -51,14 +52,14 @@ synthetic-trade.json: synthetic.json data
 	python3 $(tradedir)/genie-to-trade.py synthetic.json > $@
 
 train_dials.json: synthetic-trade.json data
-	if test "x$(transfer_from_domain)" = "x" || test "x$(transfer_to_domain)" = "x" ; then \
+	if test "x$(transfer_to_domain)" = "x" ; then \
 	  python3 $(tradedir)/augment.py synthetic-trade.json $(synthetic_sample_prob) > $@ ; \
 	else \
-	  python3 $(tradedir)/transfer-dataset.py synthetic-trade.json ${transfer_from_domain} ${transfer_to_domain} $(fewshot_pct) yes $(synthetic_sample_prob) > $@ ; \
+	  python3 $(tradedir)/transfer-dataset.py synthetic-trade.json "$(transfer_from_domain)" "$(transfer_to_domain)" "$(fewshot_pct)" "$(if $(transfer_from_domain),yes,no)" "$(synthetic_sample_prob)" > $@ ; \
 	fi
 
 clean:
-	rm -fr synthetic* train_dials.json data-generate
+	rm -fr synthetic* train_dials.json data-generated
 
 data:
 	mkdir -p $@
@@ -73,8 +74,15 @@ data-generated: train_dials.json data/dev_dials.json data/test_dials.json origin
 	cp original-ontology.json $@/multi-woz/MULTIWOZ2.1/ontology.json
 	touch $@
 
+data%-sumbt: data%
+	mkdir -p $@
+	python3 $(sumbtdir)/code_base/transform_augmented_data.py --input_dir $< --output_dir $@
+
 models/trade-dst/%/results:
 	./evaluate-trade-dst.sh "$(tradedir)" "models/trade-dst/$*"
+
+models/sumbt/%/results:
+	python3 $(sumbtdir)/code_base/
 
 evaluate: $(foreach v,$(eval_models),models/$(v)/results)
 	for f in $^ ; do echo $$f ; cat $$f ; done
