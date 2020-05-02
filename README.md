@@ -74,7 +74,9 @@ Then execute:
 make evaluate
 ```
 
-This command will place a `results` file in each model directory. The script will evaluate on the full test set (line "Everything"), and on each domain individually (all dialogues that include that domain, for the subset of slots in that domain, lines "Only X"). The results file contains three columns for each evaluation: joint accuracy, slot accuracy, and slot F1 (not reported in the paper).
+This command will place a `results` file in each model directory.
+For a TRADE model, the file will contain the evaluation on the full test set (line "Everything"), and on each domain individually (all dialogues that include that domain, for the subset of slots in that domain, lines "Only X"). The results file contains three columns for each evaluation: joint accuracy, slot accuracy, and slot F1 (not reported in the paper).
+For a SUMBT model, the file will contain the evaluation on the full test set (line "joint acc : slot acc"), and on each domain individually (all dialogues that include that domain, for the subset of slots in that domain, lines "joint X: slot acc X"). The results file contains two columns for each evaluation: joint accuracy and slot accuracy.
 
 ### Table 3: Accuracy on the full MultiWOZ dataset
 

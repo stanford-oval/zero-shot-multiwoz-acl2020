@@ -76,14 +76,14 @@ data-generated: train_dials.json data/dev_dials.json data/test_dials.json origin
 
 %-sumbt: %
 	mkdir -p $@
-	python3 $(sumbtdir)/code_base/transform_augmented_data.py --input_dir $< --output_dir $@
+	python3 $(sumbtdir)/code/transform_augmented_data.py --input_dir $< --output_dir $@
 	cp original-ontology.json $@/ontology.json
 
 models/trade-dst/%/results:
 	./evaluate-trade-dst.sh "$(tradedir)" "models/trade-dst/$*"
 
 models/sumbt/%/results:
-	python3 $(sumbtdir)/code_base/
+	./evaluate-sumbt.sh "$(sumbtdir)" "models/sumbt/$*"
 
 evaluate: $(foreach v,$(eval_models),models/$(v)/results)
 	for f in $^ ; do echo $$f ; cat $$f ; done
