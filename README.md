@@ -7,7 +7,10 @@ If you use any of the software in this repository, please cite:
 
 ```bibtex
 @inproceedings{
-...
+  title={Zero-Shot Transfer Learning with Synthesized Data for Multi-Domain Dialogue State Tracking},
+  author={Giovanni Campagna, Agata Foryciarz, Mehrad Moradshahi, Monica S. Lam},
+  booktitle={Proceedings of 58th Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers)},
+  year={2020}
 }
 ```
 
@@ -15,10 +18,11 @@ If you use any of the software in this repository, please cite:
 
 To reproduce our papers, you need the following repositories, and their exact version:
 
-- <https://github.com/stanford-oval/trade-dst> tag acl2020-submission (d2326a446f07124d2d5babe676fef54dd1b04491)
 - <https://github.com/stanford-oval/genie-toolkit> tag acl2020-submission (d37d0c01735d14c32fd699e358405e22b9cf51be)
+- <https://github.com/stanford-oval/trade-dst> tag acl2020-cameraready (b32562545b9ebf7e1ac358466146a15146bcd42f)
+- <https://github.com/stanford-oval/SUMBT> tag acl2020-camerarady (185f8eda76c4a4a42f03d2f197e5ec2ebf93a4d5)
 
-Edit the first two lines of the `Makefile` to point to the directories where you cloned those repositories.
+Edit the first three lines of the `Makefile` to point to the directories where you cloned those repositories.
 
 You will also need the following packages:
 - nodejs (version 10.*)
@@ -35,12 +39,15 @@ To install the dependencies for genie-toolkit, run the following inside the geni
 yarn install
 ```
 
-To install the dependencies for trade-dst, run the following inside the trade-dst clone:
+To install the dependencies for trade-dst and SUMBT, run the following inside those clone:
 ```
 pip3 install -r requirements.txt
 ```
 
-NOTE: the trade-dst repository includes the scripts and Dockerfiles that we used to run on Kubernetes. These scripts might be useful, if you have a Kubernetes cluster on AWS. The documentation for these scripts is provided at <https://github.com/stanford-oval/genie-k8s>.
+As the dependencies of these two repositories conflict with each other, it is recommended to use separate
+virtualenvs for each of them.
+
+NOTE: the trade-dst and SUMBT repositories includes the scripts and Dockerfiles that we used to run on Kubernetes. These scripts might be useful, if you have a Kubernetes cluster on AWS. The documentation for these scripts is provided at <https://github.com/stanford-oval/genie-k8s>.
 
 ## Pretrained Models
 
